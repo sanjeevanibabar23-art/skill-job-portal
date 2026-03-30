@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Skill & Job Portal</title>
+
+<style>
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to right, #4facfe, #00f2fe);
+  text-align: center;
+  padding: 30px;
+  margin: 0;
+}
+
+.container {
+  background: white;
+  padding: 25px;
+  margin: auto;
+  width: 320px;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+button {
+  padding: 10px;
+  margin: 10px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  width: 80%;
+  font-size: 15px;
+}
+
+button:hover {
+  background: #45a049;
+}
+
+input, select {
+  width: 90%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+h2, h3 {
+  color: #333;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(20px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+</style>
+</head>
+
+<body>
+
+<!-- HOME -->
+<div class="container" id="home">
+  <h2>Skill & Job Portal</h2>
+  <button onclick="showPage('register')">Register</button>
+  <button onclick="showPage('login')">Login</button>
+</div>
+
+<!-- REGISTER -->
+<div class="container" id="register" style="display:none;">
+  <h3>Register</h3>
+  <input id="name" placeholder="Name"><br><br>
+  <input id="email" placeholder="Email"><br><br>
+  <select id="role">
+    <option value="">Select Role</option>
+    <option value="seeker">Job Seeker</option>
+    <option value="recruiter">Recruiter</option>
+  </select><br><br>
+  <button onclick="registerUser()">Submit</button>
+  <button onclick="showPage('home')">Back</button>
+</div>
+
+<!-- LOGIN -->
+<div class="container" id="login" style="display:none;">
+  <h3>Login</h3>
+  <input id="loginEmail" placeholder="Enter Email"><br><br>
+  <button onclick="loginUser()">Login</button>
+  <button onclick="showPage('home')">Back</button>
+</div>
+
+<!-- JOB PAGE -->
+<div class="container" id="jobs" style="display:none;">
+  <h3>Post Job</h3>
+  <input id="jobTitle" placeholder="Job Title"><br><br>
+  <input id="company" placeholder="Company Name"><br><br>
+  <button onclick="postJob()">Post Job</button>
+
+  <h3>Job List</h3>
+  <div id="jobList"></div>
+
+  <button onclick="logout()">Logout</button>
+</div>
+
+<script>
+
+// Navigation
+function showPage(page){
+  document.getElementById("home").style.display="none";
+  document.getElementById("register").style.display="none";
+  document.getElementById("login").style.display="none";
+  document.getElementById("jobs").style.display="none";
+
+  document.getElementById(page).style.display="block";
+}
+
+// Register
+function registerUser(){
+  let name = document.getElementById("name").value;
+  let email = document.getElementById("email").value;
+  let role = document.getElementById("role").value;
+
+  if(!name || !email || !role){
+    alert("Fill all fields");
+    return;
+  }
+
+  localStorage.setItem(email, JSON.stringify({name,email,role}));
+  alert("Registered Successfully!");
+  showPage("home");
+}
+
+// Login
+function loginUser(){
+  let email = document.getElementById("loginEmail").value;
+  let user = localStorage.getItem(email);
+
+  if(user){
+    let data = JSON.parse(user);
+    alert("Welcome " + data.name);
+    showPage("jobs");
+    loadJobs();
+  } else {
+    alert("User not found");
+  }
+}
+
+// Post Job
+function postJob(){
+  let title = document.getElementById("jobTitle").value;
+  let company = document.getElementById("company").value;
+
+  if(!title || !company){
+    alert("Fill all fields");
+    return;
+  }
+
+  let jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+  jobs.push({title, company});
+  localStorage.setItem("jobs", JSON.stringify(jobs));
+
+  alert("Job Posted!");
+  loadJobs();
+}
+
+// Load Jobs
+function loadJobs(){
+  let jobList = document.getElementById("jobList");
+  let jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+
+  jobList.innerHTML = "";
+  jobs.forEach(job => {
+    jobList.innerHTML += `<p><b>${job.title}</b> - ${job.company}</p>`;
+  });
+}
+
+// Logout
+function logout(){
+  showPage("home");
+}
+
+</script>
+
+</body>
+</html>
